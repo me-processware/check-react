@@ -224,7 +224,7 @@ for search_path in "${SEARCH_PATHS[@]}"; do
         # Check if file contains react
         if grep -q '"react"' "$package_file" 2>/dev/null; then
             # Extract version
-            local version=""
+            version=""
             if command -v jq &> /dev/null; then
                 version=$(jq -r '.dependencies.react // .devDependencies.react // empty' "$package_file" 2>/dev/null)
             else
