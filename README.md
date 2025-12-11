@@ -1,14 +1,35 @@
-# React Vulnerability Scanner
+# React CVE-2025-55182 Vulnerability Scanner
 
-A multi-platform utility to detect and automatically update vulnerable React versions (19.0.0, 19.1.0-1, 19.2.0) across your projects.
+**Critical Remote Code Execution vulnerability scanner and automated patcher for React Server Components**
 
 **Author:** Processware  
 **License:** MIT  
-**Version:** 1.0.0
+**Version:** 2.0.0  
+**CVE:** CVE-2025-55182 (CVSS 10.0 - CRITICAL)
 
 ---
 
-## ⚠️ CRITICAL DISCLAIMER
+## ⚠️ CRITICAL SECURITY ALERT
+
+**CVE-2025-55182** is an **unauthenticated remote code execution (RCE)** vulnerability in React Server Components with a **CVSS score of 10.0** (maximum severity).
+
+### Immediate Threat
+- ✅ **Actively exploited in the wild** by China-nexus threat groups
+- ✅ **Added to CISA Known Exploited Vulnerabilities** catalog (Dec 5, 2025)
+- ✅ **No authentication required** - attackers can exploit remotely
+- ✅ **Full system compromise** possible through malicious HTTP requests
+
+### Affected Versions
+- React 19.0.0 → Update to 19.0.1
+- React 19.1.0 → Update to 19.1.2
+- React 19.1.1 → Update to 19.1.2
+- React 19.2.0 → Update to 19.2.1
+
+**If you're running any of these versions, patch immediately.**
+
+---
+
+## ⚠️ DISCLAIMER
 
 **USE THIS SCRIPT AT YOUR OWN RISK**
 
@@ -28,25 +49,37 @@ The authors of this script are **NOT responsible** for:
 
 ---
 
-## Overview
+## Why This Scanner Exists
 
-This tool scans your system for React projects with vulnerable versions and offers to update them automatically. It supports:
+CVE-2025-55182 allows attackers to execute arbitrary code on servers running vulnerable React versions. The vulnerability exists in React Server Components' payload deserialization logic.
 
-- **Windows** - PowerShell script
-- **macOS** - Bash script
-- **Linux** - Bash script
-- **Node.js environments** - JavaScript version
+**Even if your app doesn't implement React Server Function endpoints**, it may still be vulnerable if it uses React Server Components.
 
-### Detected Vulnerabilities
+This scanner helps you:
+- ✅ Detect vulnerable React installations system-wide
+- ✅ Automatically update to patched versions
+- ✅ Protect Docker containers, system services, and user projects
+- ✅ Prevent exploitation of CVE-2025-55182
 
-The scanner detects the following vulnerable React versions:
+---
 
-| Version | Vulnerability | Update To |
-|---------|---|---|
-| 19.0.0 | Server Component Security Issue | 19.0.1 |
-| 19.1.0 | Dependency Injection Flaw | 19.1.2 |
-| 19.1.1 | Dependency Injection Flaw | 19.1.2 |
-| 19.2.0 | State Management Bug | 19.2.1 |
+## Why Sudo/Admin Privileges Are Required
+
+This scanner needs system-wide access to find **all** vulnerable React installations, including:
+
+### Linux/macOS
+- **Docker containers:** `/var/lib/docker/` - Containerized applications
+- **System services:** `/opt/`, `/srv/` - Production deployments
+- **Application directories:** `/usr/local/` - System-wide installations
+- **Root projects:** `/root/` - Admin-owned projects
+- **User directories:** `/home/` - All user accounts
+
+### Windows
+- **Program Files:** `C:\Program Files\`, `C:\Program Files (x86)\`
+- **User directories:** `C:\Users\`
+- **Application data:** `C:\ProgramData\`
+
+**Without elevated privileges**, the scanner can only check your personal home directory, potentially missing critical vulnerable installations in production environments.
 
 ---
 
@@ -55,7 +88,7 @@ The scanner detects the following vulnerable React versions:
 ### Option 1: Clone the Repository
 
 ```bash
-git clone https://github.com/processware/check-react.git
+git clone https://github.com/me-processware/check-react.git
 cd check-react
 ```
 
@@ -70,75 +103,77 @@ Download the script for your platform:
 
 ## Usage
 
+### Linux/macOS (Bash)
+
+#### System-Wide Scan (Recommended)
+```bash
+# Make script executable
+chmod +x check_react.sh
+
+# Run with sudo for full system scan
+sudo ./check_react.sh
+```
+
+#### Dry-Run Mode (Preview Changes)
+```bash
+# See what would be updated without making changes (no sudo needed)
+./check_react.sh --dry-run
+```
+
+#### Help
+```bash
+./check_react.sh --help
+```
+
+---
+
 ### Windows (PowerShell)
 
-#### Basic Usage
+#### System-Wide Scan (Recommended)
 ```powershell
-# Run with user confirmation for each update
+# Run PowerShell as Administrator, then:
 .\check_react.ps1
 ```
 
 #### Dry-Run Mode (Preview Changes)
 ```powershell
-# See what would be updated without making changes
+# No admin privileges needed for dry-run
 .\check_react.ps1 -DryRun
 ```
 
-**Requirements:**
-- PowerShell 5.1 or later
-- npm or yarn installed
-- Read access to your home directory
+#### Help
+```powershell
+.\check_react.ps1 -Help
+```
 
-**Execution Policy:**
-If you get an execution policy error, run:
+**Note:** If you get an execution policy error:
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ---
 
-### macOS / Linux (Bash)
-
-#### Basic Usage
-```bash
-# Make script executable
-chmod +x check_react.sh
-
-# Run with user confirmation for each update
-./check_react.sh
-```
-
-#### Dry-Run Mode (Preview Changes)
-```bash
-./check_react.sh --dry-run
-```
-
-**Requirements:**
-- Bash 4.0 or later
-- npm or yarn installed
-- Read access to your home directory
-
----
-
 ### Node.js (JavaScript)
 
-#### Basic Usage
+#### System-Wide Scan (Recommended)
 ```bash
-# Install dependencies (if not already installed)
-npm install
+# Linux/macOS
+sudo node check_react.js
 
-# Run with user confirmation for each update
+# Windows (run PowerShell as Administrator)
 node check_react.js
 ```
 
 #### Dry-Run Mode (Preview Changes)
 ```bash
+# No sudo/admin needed for dry-run
 node check_react.js --dry-run
 ```
 
-**Requirements:**
-- Node.js 14 or later
-- npm or yarn installed
+#### Help
+```bash
+node check_react.js --help
+```
 
 ---
 
@@ -146,136 +181,191 @@ node check_react.js --dry-run
 
 ### ✅ What This Script Does
 
-- **Scans recursively** through your project directories
-- **Detects vulnerable React versions** automatically
-- **Shows clear warnings** with color-coded output
-- **Creates backups** before making changes (improved version)
-- **Supports multiple package managers** (npm and yarn)
-- **Asks for confirmation** before updating each project
-- **Provides detailed logging** of what was changed
+- **System-wide scanning** - Finds vulnerable React installations everywhere
+- **CVE-2025-55182 detection** - Specifically checks for this critical vulnerability
+- **Automatic updates** - Patches to safe versions with user confirmation
+- **Backup creation** - Saves `package.json` before making changes
+- **Dry-run mode** - Preview changes without modifying anything
+- **Multiple package managers** - Supports npm and yarn
+- **Input validation** - Prevents command injection attacks
+- **Detailed reporting** - Shows exactly what was found and updated
 
 ### ❌ What This Script Does NOT Do
 
-- Does NOT require root/admin privileges (improved version)
 - Does NOT modify system files
 - Does NOT install additional dependencies
 - Does NOT change other packages (only React and React-DOM)
 - Does NOT work offline (requires npm registry access)
+- Does NOT guarantee 100% protection (always review security logs)
 
 ---
 
 ## How It Works
 
-### Step 1: Scanning
-The script searches your home directory for `package.json` files:
-- **Depth limit:** 5 levels (prevents excessive scanning)
-- **Excludes:** `node_modules`, `.git`, `dist`, `build`, `.next`, `.cache`
-- **Skips:** Symlinks (prevents infinite loops)
+### Step 1: Privilege Check
+- Verifies sudo/admin privileges for system-wide scan
+- Allows dry-run mode without elevated privileges
 
-### Step 2: Detection
+### Step 2: System-Wide Scanning
+Searches the following locations:
+- **Linux/macOS:** `/root`, `/home`, `/var/lib/docker`, `/opt`, `/srv`, `/usr/local`
+- **Windows:** `C:\Users`, `C:\Program Files`, `C:\Program Files (x86)`, `C:\ProgramData`
+
+Finds all `package.json` files (excluding `node_modules`) up to 10 levels deep.
+
+### Step 3: Vulnerability Detection
 For each `package.json` found:
-1. Reads the file and parses JSON
+1. Reads and parses the file
 2. Checks `dependencies.react` and `devDependencies.react`
-3. Compares version against known vulnerabilities
-4. Reports any matches with recommended update version
+3. Compares version against CVE-2025-55182 vulnerable versions
+4. Reports matches with recommended patch version
 
-### Step 3: User Confirmation
-For each vulnerable project found:
-1. Displays project location
-2. Shows current and recommended versions
+### Step 4: User Confirmation
+For each vulnerable project:
+1. Displays project location and current version
+2. Shows CVE details and recommended update
 3. Asks user for confirmation (y/n)
 4. Only proceeds if user confirms
 
-### Step 4: Update
+### Step 5: Automated Patching
 When user confirms:
-1. Creates backup of `package.json` (with timestamp)
-2. Runs `npm install` or `yarn add` with the new version
-3. Reports success or failure
-4. Continues to next project
+1. Creates timestamped backup of `package.json`
+2. Detects package manager (npm or yarn)
+3. Runs `npm install` or `yarn add` with patched version
+4. Reports success or failure
+5. Continues to next project
 
-### Step 5: Summary
-Shows final report:
-- Total vulnerable versions found
-- Total projects updated
-- Any failures encountered
+### Step 6: Summary Report
+Shows final statistics:
+- Total vulnerable installations found
+- Total projects successfully updated
+- Remaining vulnerable projects (if any)
+- Recommended actions
 
 ---
 
-## Security Considerations
+## Example Output
 
-### Version 1.0.0 Improvements
+```bash
+$ sudo ./check_react.sh
+╔════════════════════════════════════════════════════════════╗
+║  React CVE-2025-55182 Vulnerability Scanner (React2Shell)  ║
+╚════════════════════════════════════════════════════════════╝
 
-✅ **Input Validation**
-- All version strings are validated against regex pattern
+⚠️  CVE-2025-55182: CRITICAL (CVSS 10.0)
+Unauthenticated Remote Code Execution in React Server Components
+Actively exploited in the wild - Immediate patching required
+
+=== Scanning System for Vulnerable React Installations ===
+
+Scanning directories:
+  • User home directories
+  • Docker containers (/var/lib/docker)
+  • System services (/opt, /srv)
+  • Application directories (/usr/local)
+
+Scanning: /home
+⚠️  VULNERABLE: React 19.0.0
+   📁 Location: /home/user/myapp
+   🔒 CVE-2025-55182: Remote Code Execution
+   📦 Update to: 19.0.1
+
+Scanning: /var/lib/docker
+⚠️  VULNERABLE: React 19.1.0
+   📁 Location: /var/lib/docker/containers/abc123/app
+   🔒 CVE-2025-55182: Remote Code Execution
+   📦 Update to: 19.1.2
+
+═══════════════════════════════════════════════════════════
+  CRITICAL: 2 Vulnerable Installation(s) Found
+═══════════════════════════════════════════════════════════
+
+These installations are vulnerable to CVE-2025-55182:
+• Unauthenticated Remote Code Execution
+• CVSS Score: 10.0 (CRITICAL)
+• Actively exploited in the wild
+
+=== Update Vulnerable Projects ===
+
+Project 1/2: /home/user/myapp
+   Update to React 19.0.1? (y/n): y
+
+📦 Updating React to 19.0.1...
+   📁 In: /home/user/myapp
+   💾 Backup created: package.json.backup.20251211_143022
+   Using npm...
+   ✅ Successfully updated!
+
+Project 2/2: /var/lib/docker/containers/abc123/app
+   Update to React 19.1.2? (y/n): y
+
+📦 Updating React to 19.1.2...
+   📁 In: /var/lib/docker/containers/abc123/app
+   💾 Backup created: package.json.backup.20251211_143045
+   Using npm...
+   ✅ Successfully updated!
+
+═══════════════════════════════════════════════════════════
+                         SUMMARY
+═══════════════════════════════════════════════════════════
+⚠️  2 vulnerable installation(s) found
+✅ 2 project(s) updated
+Your system is now protected against CVE-2025-55182
+═══════════════════════════════════════════════════════════
+```
+
+---
+
+## Security Features
+
+### Input Validation
+- All version strings validated against regex: `^[\^~]?\d+\.\d+\.\d+`
 - Prevents command injection attacks
 - Rejects malformed version strings
 
-✅ **Privilege Management**
-- No `sudo` or elevated privileges required
-- Only scans user's home directory
-- Cannot access system files
-
-✅ **Safe File Operations**
+### Safe File Operations
 - Uses `lstat()` to detect and skip symlinks
 - Prevents infinite loops on circular symlinks
-- Limits recursion depth to 5 levels
-- Skips common directories (node_modules, etc.)
+- Limits recursion depth to 10 levels
+- Skips common directories (`node_modules`, `.git`, etc.)
 
-✅ **Backup Creation**
+### Backup Creation
 - Automatically creates timestamped backups
-- Stores backups alongside original files
+- Format: `package.json.backup.YYYYMMDD_HHMMSS`
+- Stored alongside original files
 - Allows manual rollback if needed
 
-✅ **Error Handling**
-- Graceful handling of permission denied errors
-- Continues processing even if one project fails
-- Detailed error messages for debugging
-
-### Known Limitations
-
-⚠️ **Dependency Conflicts**
-- Script does NOT resolve dependency conflicts
-- If update fails, you may need manual intervention
-- Test thoroughly before production use
-
-⚠️ **Monorepo Support**
-- Works with monorepos but updates each package separately
-- May not handle workspaces optimally
-- Consider using `--dry-run` first
-
-⚠️ **Version Pinning**
-- Script respects existing version specifiers (^, ~)
-- May not update if version is pinned with exact version
-- Manually edit package.json if needed
+### Dry-Run Mode
+- Preview all changes before applying
+- No elevated privileges required
+- Safe testing environment
+- Shows exact commands that would be executed
 
 ---
 
 ## Troubleshooting
 
-### Script Won't Run
-
-**Windows PowerShell:**
-```powershell
-# Check execution policy
-Get-ExecutionPolicy
-
-# Set to allow scripts
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+### "Permission Denied" Errors
 
 **Linux/macOS:**
 ```bash
-# Make script executable
-chmod +x check_react.sh
+# Make sure you're using sudo
+sudo ./check_react.sh
 
-# Run with explicit bash
-bash check_react.sh
+# Check script permissions
+chmod +x check_react.sh
+```
+
+**Windows:**
+```powershell
+# Run PowerShell as Administrator
+# Right-click PowerShell → "Run as Administrator"
 ```
 
 ### npm Install Fails
 
 **Common causes:**
-- Outdated npm version → Update: `npm install -g npm@latest`
+- Outdated npm → Update: `npm install -g npm@latest`
 - Network issues → Check internet connection
 - Dependency conflicts → Review error messages
 - Disk space → Ensure sufficient disk space
@@ -286,110 +376,16 @@ bash check_react.sh
 3. Run `npm install react@VERSION --save` directly
 4. Review error messages for specific issues
 
-### Permission Denied Errors
-
-**Linux/macOS:**
-```bash
-# Check file permissions
-ls -la package.json
-
-# Fix permissions if needed
-chmod 644 package.json
-```
-
-**Windows:**
-- Right-click PowerShell → Run as Administrator
-- Or check folder permissions in Properties
-
 ### No Vulnerable Projects Found
 
 This is **good news**! It means:
-- ✅ Your React versions are up-to-date
-- ✅ No known vulnerabilities detected
-- ✅ Your projects are secure (for these specific CVEs)
+- ✅ Your React versions are patched
+- ✅ No CVE-2025-55182 vulnerabilities detected
+- ✅ Your system is protected
 
 ---
 
-## Examples
-
-### Example 1: Basic Scan
-
-```bash
-$ ./check_react.sh
-🔍 React Server Components Vulnerability Scanner
-[DRY-RUN MODE] - No changes will be made
-
-=== React Server Components Vulnerability Check ===
-
-Scanning from: /Users/username
-
-⚠️  VULNERABLE: React 19.0.0
-   📁 Location: /Users/username/projects/myapp
-   📦 Update to: 19.0.1
-
-=== Update Vulnerable Projects ===
-
-Project 1/1: /Users/username/projects/myapp
-   Update? (y/n): y
-
-📦 Updating React to 19.0.1...
-   📁 In: /Users/username/projects/myapp
-   Using npm...
-   ✅ Successfully updated!
-
-=== Results ===
-⚠️  1 vulnerable version(s) found
-✅ 1 project(s) updated
-```
-
-### Example 2: Dry-Run Mode
-
-```powershell
-PS> .\check_react.ps1 -DryRun
-🔍 React Server Components Vulnerability Scanner
-[DRY-RUN MODE] - No changes will be made
-
-=== React Server Components Vulnerability Check ===
-
-Scanning from: C:\Users\username
-
-⚠️  VULNERABLE: React 19.1.0
-   Location: C:\Users\username\projects\webapp
-   Update to: 19.1.2
-
-=== Update Vulnerable Projects ===
-
-Project 1/1: C:\Users\username\projects\webapp
-   Update? (y/n): y
-
-📦 Updating React to 19.1.2...
-   In: C:\Users\username\projects\webapp
-   [DRY-RUN] Would execute: npm install react@19.1.2 react-dom@19.1.2 --save --legacy-peer-deps
-
-=== Results ===
-⚠️  1 vulnerable version(s) found
-✅ 0 project(s) updated
-```
-
-### Example 3: No Vulnerabilities
-
-```bash
-$ ./check_react.sh
-🔍 React Server Components Vulnerability Scanner
-
-=== React Server Components Vulnerability Check ===
-
-Scanning from: /home/user
-
-=== Results ===
-✅ No vulnerable versions found!
-```
-
----
-
-## Advanced Usage
-
-### Backup Recovery
+## Backup Recovery
 
 If an update breaks something, restore from backup:
 
@@ -398,39 +394,54 @@ If an update breaks something, restore from backup:
 ls -la package.json.backup.*
 
 # Restore specific backup
-cp package.json.backup.20250101_120000 package.json
+cp package.json.backup.20251211_143022 package.json
 
 # Reinstall dependencies
 npm install
 ```
 
-### Manual Update
+---
 
-If the script fails, update manually:
+## Technical Details
 
-```bash
-cd /path/to/project
-npm install react@19.0.1 react-dom@19.0.1 --save
-```
+### CVE-2025-55182 Overview
 
-### Batch Processing
+**Type:** Unauthenticated Remote Code Execution (RCE)  
+**CVSS Score:** 10.0 (CRITICAL)  
+**Attack Vector:** Network  
+**Attack Complexity:** Low  
+**Privileges Required:** None  
+**User Interaction:** None  
 
-To update multiple projects without confirmation:
+**Vulnerability:** Unsafe deserialization in React's Flight protocol when handling server component payloads. Attackers can craft malicious HTTP requests to any Server Function endpoint that, when deserialized by React, achieves remote code execution on the server.
 
-```bash
-# Create a wrapper script
-for dir in /path/to/projects/*/; do
-    cd "$dir"
-    npm install react@19.0.1 react-dom@19.0.1 --save
-done
-```
+**Affected Packages:**
+- `react-server-dom-webpack`
+- `react-server-dom-parcel`
+- `react-server-dom-turbopack`
+
+**Timeline:**
+- **Nov 29, 2025:** Discovered by Lachlan Davidson
+- **Dec 3, 2025:** Publicly disclosed, patches released
+- **Dec 5, 2025:** Added to CISA Known Exploited Vulnerabilities
+- **Ongoing:** Active exploitation by threat actors
+
+---
+
+## References
+
+- **Official React Advisory:** https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components
+- **NVD Entry:** https://nvd.nist.gov/vuln/detail/CVE-2025-55182
+- **CISA Alert:** https://www.cisa.gov/news-events/alerts/2025/12/05/cisa-adds-one-known-exploited-vulnerability-catalog
+- **Wiz Research:** https://www.wiz.io/blog/critical-vulnerability-in-react-cve-2025-55182
+- **Palo Alto Unit 42:** https://unit42.paloaltonetworks.com/cve-2025-55182-react-and-cve-2025-66478-next/
 
 ---
 
 ## Contributing
 
 Found a bug? Have a suggestion? Please open an issue on GitHub:
-https://github.com/processware/check-react/issues
+https://github.com/me-processware/check-react/issues
 
 ### Security Issues
 
@@ -440,14 +451,21 @@ If you discover a security vulnerability in this script, please email security@p
 
 ## Changelog
 
-### Version 1.0.0 (2025-01-11)
+### Version 2.0.0 (2025-12-11)
+- ✅ **BREAKING:** Now requires sudo/admin for system-wide scan
+- ✅ Added CVE-2025-55182 specific detection and warnings
+- ✅ System-wide scanning (Docker, services, all users)
+- ✅ Dry-run mode for safe testing
+- ✅ Improved output with CVE details
+- ✅ Enhanced security warnings
+- ✅ Better error handling and reporting
+
+### Version 1.0.0 (2025-12-11)
 - ✅ Initial release
 - ✅ Support for Windows, macOS, Linux
 - ✅ JavaScript, PowerShell, and Bash versions
 - ✅ Input validation and command injection prevention
 - ✅ Backup creation before updates
-- ✅ Dry-run mode for safe testing
-- ✅ Comprehensive error handling
 
 ---
 
@@ -461,25 +479,25 @@ MIT License - See LICENSE file for details
 
 For questions or issues:
 1. Check the [Troubleshooting](#troubleshooting) section
-2. Review the [Examples](#examples) section
+2. Review the [Example Output](#example-output) section
 3. Open an issue on GitHub
 4. Contact: support@processware.com
 
 ---
 
-## Disclaimer (Again)
+## Final Warning
 
-**This script is provided AS-IS without any warranty.** By using this script, you acknowledge that:
+**This vulnerability is actively being exploited.** If you find vulnerable installations:
 
-1. You have read and understood this entire README
-2. You have backed up your project files
-3. You understand the risks involved
-4. You take full responsibility for any consequences
-5. The authors are not liable for any damage
+1. ✅ **Patch immediately** - Don't delay
+2. ✅ **Review security logs** - Check for exploitation attempts
+3. ✅ **Isolate vulnerable systems** - Until patched
+4. ✅ **Monitor for suspicious activity** - Ongoing vigilance required
 
-**Use responsibly. Test thoroughly. Backup always.**
+**The scanner is a tool, not a silver bullet. Always maintain defense-in-depth security practices.**
 
 ---
 
-**Last Updated:** January 11, 2025  
-**Maintained by:** Processware
+**Last Updated:** December 11, 2025  
+**Maintained by:** Processware  
+**CVE:** CVE-2025-55182 (CVSS 10.0)
